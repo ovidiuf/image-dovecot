@@ -6,7 +6,10 @@ cat <<EOF
 Utility that encapsulates the logic of adding an IMAP user to the dovecot instance configuration
 and supporting system files. To be used as part of Dockerfile RUN directive.
 
-RUN ./bin/add-imap-user-to-image <user-name>
+RUN ./bin/add-imap-user-to-image <user-name> \
+    --uid=<uid> \
+    --gid=<gid> \
+    --dovecot-conf-file=<dovecot-conf-file>
 
 EOF
 }
@@ -14,6 +17,8 @@ EOF
 function main() {
 
     local user
+    local uid
+    local gid
     local dovecot_conf_file
 
     while [ -n "$1" ]; do
@@ -21,6 +26,14 @@ function main() {
         if [ -z "${user}" ]; then
 
             user=$1
+
+        elif [[ $1 =~ --uid= ]]; then
+
+            uid=${1:6}
+
+        elif [[ $1 =~ --gid= ]]; then
+
+            gid=${1:6}
 
         elif [[ $1 =~ --dovecot-conf-file= ]]; then
 
@@ -33,24 +46,56 @@ function main() {
 
     [ -z "${user}" ] && { usage; return 1; }
 
-    add-user "${user}" "${dovecot_conf_file}"
+    add-user "${user}" "${uid}" "${gid}" "${dovecot_conf_file}"
 }
 
 function add-user() {
 
     local user=$1
-    local dovecot_conf_file=$2
+    local uid=$2
+    local gid=$3
+    local dovecot_conf_file=$4
 
+    [ -z "${user}" ] && { echo "'user' not provided" 1>&2; exit 1; }
+    [ -z "${uid}" ] && { echo "'uid' not provided" 1>&2; exit 1; }
+    [ -z "${gid}" ] && { echo "'gid' not provided" 1>&2; exit 1; }
     [ -z "${dovecot_conf_file}" ] && { echo "'dovecot_conf_file' not provided" 1>&2; exit 1; }
     [ -f ${dovecot_conf_file} ] || { echo "dovecot_conf_file ${dovecot_conf_file} does not exist or not readable" 1>&2; exit 1; }
 
     echo "adding IMAP user '${user}' ..."
+    echo "uid: ${uid}"
+    echo "gid: ${gid}"
     echo "dovecot configuration file: ${dovecot_conf_file}"
-
 
     #
     # should update first_valid_uid, last_valid_uid, first_valid_gid and last_valid_gid in the dovecot config file.
     #
+
+    #
+    # add password to /opt/dovecot/conf/passwd
+    #
+
+    local passwd_file=$(dirname ${dovecot_conf_file})/passwd
+
+    echo "${user}:{HMAC-MD5}529d585a1715f9aa4df070c6fe54fda19de658f14f6fb297149ebafab0f30d36" >> ${passwd_file}
+    chmod 0600 ${passwd_file}
+
+    #
+    # add user to /opt/dovecot/conf/userdb
+    #
+
+    local userdb_file=$(dirname ${dovecot_conf_file})/userdb
+    local user_home_dir=/opt/dovecot/home/${user}
+
+    echo "${user}:x:${uid}:${gid}::${user_home_dir}:-" >> ${userdb_file}
+
+    #
+    # create the home directory
+    #
+
+    mkdir ${user_home_dir}
+    chown ${uid}:${gid} ${user_home_dir}
+    chmod 0700 ${user_home_dir}
 }
 
 main "$@"
