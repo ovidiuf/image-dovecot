@@ -1,15 +1,35 @@
-FROM alpine
+FROM centos
+
+
+USER root
+
+COPY ./root /
+
+#
+# stage utility scripts
+#
+
+COPY ./bin/add-imap-user-to-image /opt/.add-imap-user-to-image
 
 #
 # add the operational user 'dovecot'
 #
 
-USER root
+ENV DOVECOT_USER_UID 20205
+ENV DOVECOT_USER_GID 20205
 
-RUN echo "dovecot:x:20205:" >> /etc/group && \
-    echo "dovecot:x:20205:20205::/opt/dovecot/home/dovecot:/bin/ash" >> /etc/passwd && \
-    mkdir -p /opt/dovecot/home/dovecot && \
-    chown -R 20205:20205 /opt/dovecot
+RUN mkdir -p /opt/dovecot/home/ && \
+    groupadd -g ${DOVECOT_USER_GID} dovecot && \
+    useradd -m -g ${DOVECOT_USER_GID} -u ${DOVECOT_USER_UID} -d /opt/dovecot/home/dovecot dovecot && \
+    chown -R ${DOVECOT_USER_UID}:${DOVECOT_USER_GID} /opt/dovecot && \
+#
+# add IMAP users ...
+#
+    /opt/.add-imap-user-to-image ovidiu \
+        --dovecot-conf-file=/opt/dovecot/conf/dovecot.conf && \
+#
+# remove utility scripts
+#
+    rm /opt/.add-imap-user-to-image
 
-USER dovecot:dovecot
 
