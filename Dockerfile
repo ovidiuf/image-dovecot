@@ -40,6 +40,6 @@ RUN yum install -y iproute net-tools && \
 
 WORKDIR /opt/dovecot
 
-#ENTRYPOINT ["/opt/dovecot/bin/dovecot", "-c", "/opt/dovecot/conf/dovecot.conf"]
-
+# TODO remove this after troubleshooting
 ENTRYPOINT ["/opt/dovecot/entrypoint.sh"]
+#ENTRYPOINT ["/opt/dovecot/bin/dovecot", "-c", "/opt/dovecot/conf/dovecot.conf"]
