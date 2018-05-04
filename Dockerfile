@@ -35,11 +35,13 @@ RUN yum install -y iproute net-tools && \
 #
 # remove utility scripts
 #
-    rm /opt/.add-imap-user-to-image
-
+    rm /opt/.add-imap-user-to-image && \
+#
+# adjust /opt/dovecot/run/login permissions
+#
+    chown root /opt/dovecot/run/login && \
+    chmod o-rwx /opt/dovecot/run/login
 
 WORKDIR /opt/dovecot
 
-# TODO remove this after troubleshooting
-ENTRYPOINT ["/opt/dovecot/entrypoint.sh"]
-#ENTRYPOINT ["/opt/dovecot/bin/dovecot", "-c", "/opt/dovecot/conf/dovecot.conf"]
+ENTRYPOINT ["/opt/dovecot/bin/dovecot", "-F", "-c", "/opt/dovecot/conf/dovecot.conf"]
