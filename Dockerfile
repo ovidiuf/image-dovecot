@@ -9,7 +9,8 @@ COPY ./root /
 # stage utility scripts
 #
 
-COPY ./bin/add-imap-user-to-image /opt/.add-imap-user-to-image
+COPY ./bin/add-imap-user-to-image /opt/.tmp/add-imap-user-to-image
+COPY ./bin/replace-variables-in-conf /opt/.tmp/replace-variables-in-conf
 
 #
 # add the operational user 'dovecot'
@@ -33,9 +34,13 @@ RUN yum install -y iproute net-tools && \
         --gid=58580 \
         --dovecot-conf-file=/opt/dovecot/conf/dovecot.conf && \
 #
+# Replace variables in the configuration file. Dovecot does not seem to support environment variables
+# directly.
+#
+#
 # remove utility scripts
 #
-    rm /opt/.add-imap-user-to-image && \
+    rm -r /opt/.tmp && \
 #
 # adjust /opt/dovecot/run/login permissions
 #
