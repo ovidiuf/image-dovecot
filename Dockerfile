@@ -1,5 +1,19 @@
 FROM centos
 
+#
+# Default values - we expect these to be overridden by docker run command
+#
+ENV DOVECOT_LISTEN_ADDRESS *
+ENV DOVECOT_LISTEN_PORT 143
+
+#
+# We don't expect these to be overridden in the command line:
+#
+# The operational user 'dovecot'
+#
+
+ENV DOVECOT_USER_UID 20205
+ENV DOVECOT_USER_GID 20205
 
 USER root
 
@@ -10,16 +24,8 @@ COPY ./root /
 #
 
 COPY ./bin/add-imap-user-to-image /opt/.tmp/add-imap-user-to-image
-COPY ./bin/replace-variables-in-conf /opt/.tmp/replace-variables-in-conf
 
-#
-# add the operational user 'dovecot'
-#
-
-ENV DOVECOT_USER_UID 20205
-ENV DOVECOT_USER_GID 20205
-
-RUN yum install -y iproute net-tools && \
+RUN yum install -y iproute net-tools gettext && \
   mkdir -p /opt/dovecot/home/ && \
   groupadd -g ${DOVECOT_USER_GID} dovecot && \
   useradd -m -g ${DOVECOT_USER_GID} -u ${DOVECOT_USER_UID} -d /opt/dovecot/home/dovecot dovecot && \
@@ -34,11 +40,6 @@ RUN yum install -y iproute net-tools && \
    --gid=58580 \
    --dovecot-conf-file=/opt/dovecot/conf/dovecot.conf && \
 #
-# Replace variables in the configuration file. Dovecot does not seem to support environment variables
-# directly.
-#
-  /opt/.tmp/replace-variables-in-conf && \
-#
 # remove utility scripts
 #
   rm -r /opt/.tmp && \
@@ -50,4 +51,4 @@ RUN yum install -y iproute net-tools && \
 
 WORKDIR /opt/dovecot
 
-ENTRYPOINT ["/opt/dovecot/bin/dovecot", "-F", "-c", "/opt/dovecot/conf/dovecot.conf"]
+ENTRYPOINT ["./bin/container-entrypoint"]

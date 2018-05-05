@@ -1,3 +1,10 @@
 #!/usr/bin/env bash
 
-docker run -d --network=host --restart=no --name=dovecot dovecot-v1.0.15-custom 
+docker run \
+  -d \
+  -e DOVECOT_LISTEN_ADDRESS=192.168.1.136 \
+  -e DOVECOT_LISTEN_PORT=555 \
+  --network=host \
+  --restart=no \
+  --name=dovecot \
+ dovecot-v1.0.15-custom
