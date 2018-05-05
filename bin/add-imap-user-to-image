@@ -7,9 +7,11 @@ Utility that encapsulates the logic of adding an IMAP user to the dovecot instan
 and supporting system files. To be used as part of Dockerfile RUN directive.
 
 RUN ./bin/add-imap-user-to-image <user-name> \
+    --password=<password> \
     --uid=<uid> \
     --gid=<gid> \
-    --dovecot-conf-file=<dovecot-conf-file>
+    --dovecot-conf-file=<dovecot-conf-file> \
+    --dovecotpw=<dovecotpw-fully-qualified-path>
 
 EOF
 }
@@ -17,15 +19,21 @@ EOF
 function main() {
 
     local user
+    local password
     local uid
     local gid
     local dovecot_conf_file
+    local dovecotpw_file
 
     while [ -n "$1" ]; do
 
         if [ -z "${user}" ]; then
 
             user=$1
+
+        elif [[ $1 =~ --password= ]]; then
+
+            password=${1:11}
 
         elif [[ $1 =~ --uid= ]]; then
 
@@ -39,28 +47,40 @@ function main() {
 
             dovecot_conf_file=${1:20}
 
+        elif [[ $1 =~ --dovecotpw= ]]; then
+
+            dovecotpw_file=${1:12}
+
         fi
 
         shift;
     done
 
+    [[ ${password} =~ REPLACE ]] && { echo "" 1>&2; echo "provide a valid password for add-imap-user-to-image [...] --password=... in Dockerfile" 1>&2; echo "" 1>&2; exit 1; }
+
     [ -z "${user}" ] && { usage; return 1; }
 
-    add-user "${user}" "${uid}" "${gid}" "${dovecot_conf_file}"
+    add-user "${user}" "${password}" "${uid}" "${gid}" "${dovecot_conf_file}" "${dovecotpw_file}"
 }
 
 function add-user() {
 
     local user=$1
-    local uid=$2
-    local gid=$3
-    local dovecot_conf_file=$4
+    local password=$2
+    local uid=$3
+    local gid=$4
+    local dovecot_conf_file=$5
+    local dovecotpw_file=$6
 
     [ -z "${user}" ] && { echo "'user' not provided" 1>&2; exit 1; }
+    [ -z "${password}" ] && { echo "'password' not provided" 1>&2; exit 1; }
     [ -z "${uid}" ] && { echo "'uid' not provided" 1>&2; exit 1; }
     [ -z "${gid}" ] && { echo "'gid' not provided" 1>&2; exit 1; }
     [ -z "${dovecot_conf_file}" ] && { echo "'dovecot_conf_file' not provided" 1>&2; exit 1; }
     [ -f ${dovecot_conf_file} ] || { echo "dovecot_conf_file ${dovecot_conf_file} does not exist or not readable" 1>&2; exit 1; }
+    [ -z "${dovecotpw_file}" ] && { echo "'dovecotpw_file' not provided" 1>&2; exit 1; }
+    [ -f ${dovecotpw_file} ] || { echo "dovecotpw_file ${dovecot_conf_file} does not exist or not readable" 1>&2; exit 1; }
+    [ -x ${dovecotpw_file} ] || { echo "dovecotpw_file ${dovecot_conf_file} cannot be executed" 1>&2; exit 1; }
 
     echo "adding IMAP user '${user}' ..."
     echo "uid: ${uid}"
@@ -73,10 +93,13 @@ function add-user() {
     # add password to /opt/dovecot/conf/passwd
     #
 
-    local passwd_file=$(dirname ${dovecot_conf_file})/passwd
+    #
+    # generate the password
+    #
 
-    # TODO encode in-line
-    echo "${user}:{HMAC-MD5}529d585a1715f9aa4df070c6fe54fda19de658f14f6fb297149ebafab0f30d36" >> ${passwd_file}
+    local passwd_file=$(dirname ${dovecot_conf_file})/passwd
+    local hashed_password=$(${dovecotpw_file} -p ${password}) || exit 1
+    echo "${user}:${hashed_password}" >> ${passwd_file}
     chmod 0600 ${passwd_file}
 
     #

@@ -36,9 +36,11 @@ RUN yum install -y iproute net-tools gettext && \
 # needs to be created, just we need to make sure there's no uid/gid conflict.
 #
   /opt/.tmp/add-imap-user-to-image ovidiu \
+   --password=REPLACE-WITH-PASSWORD-BEFORE-BUILD \
    --uid=58580 \
    --gid=58580 \
-   --dovecot-conf-file=/opt/dovecot/conf/dovecot.conf && \
+   --dovecot-conf-file=/opt/dovecot/conf/dovecot.conf \
+   --dovecotpw=/opt/dovecot/bin/dovecotpw && \
 #
 # remove utility scripts
 #
