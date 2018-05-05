@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+function usage() {
+cat <<EOF
+
+Utility that replaces all DOVECOT_* environment variables reference in the
+configuration script, if found in the environment.
+
+EOF
+}
+
+function main() {
+
+ replace-variables;
+
+}
+
+function replace-variables() {
+
+  echo "REPLACING VARIABLES"
+}
+
+main "$@"
