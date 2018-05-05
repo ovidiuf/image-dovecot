@@ -51,4 +51,4 @@ RUN yum install -y iproute net-tools gettext && \
 
 WORKDIR /opt/dovecot
 
-ENTRYPOINT ["./bin/container-entrypoint"]
+ENTRYPOINT ["./bin/entrypoint"]

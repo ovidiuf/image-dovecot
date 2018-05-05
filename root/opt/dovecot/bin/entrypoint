@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+function main() {
+
+    #
+    # replace environment variables declared in the Dovecot configuration file. Dovecot does not do that
+    #
+
+    cat /opt/dovecot/conf/dovecot.conf | envsubst > /tmp/.tmp.txt
+    mv /tmp/.tmp.txt /opt/dovecot/conf/dovecot.conf
+    chown dovecot:dovecot /opt/dovecot/conf/dovecot.conf
+
+    exec /opt/dovecot/bin/dovecot -F -c /opt/dovecot/conf/dovecot.conf
+}
+
+main "$@"
