@@ -67,9 +67,7 @@ function add-user() {
     echo "gid: ${gid}"
     echo "dovecot configuration file: ${dovecot_conf_file}"
 
-    #
-    # should update first_valid_uid, last_valid_uid, first_valid_gid and last_valid_gid in the dovecot config file.
-    #
+    update-valid-ids ${uid} ${gid} ${dovecot_conf_file}
 
     #
     # add password to /opt/dovecot/conf/passwd
@@ -97,6 +95,62 @@ function add-user() {
     mkdir ${user_home_dir}
     chown ${uid}:${gid} ${user_home_dir}
     chmod 0700 ${user_home_dir}
+}
+
+#
+# Updates 'first_valid_uid', 'last_valid_uid', 'first_valid_gid' and 'first_valid_gid' in the dovecot config file.
+#
+function update-valid-ids() {
+
+    local uid=$1
+    local gid=$2
+    local dovecot_conf_file=$3
+
+    [ -z "${uid}" ] && { echo "'uid' not provided" 1>&2; exit 1; }
+    [ -z "${gid}" ] && { echo "'gid' not provided" 1>&2; exit 1; }
+    [ -z "${dovecot_conf_file}" ] && { echo "'dovecot_conf_file' not provided" 1>&2; exit 1; }
+    [ -f ${dovecot_conf_file} ] || { echo "dovecot_conf_file ${dovecot_conf_file} does not exist or not readable" 1>&2; exit 1; }
+
+    echo "updating first_valid_uid/last_valid_uid/first_valid_gid/first_valid_gid in ${dovecot_conf_file} ..."
+
+    local temp_file=/tmp/.sed.tmp
+
+    local first_valid_uid=$(grep "^first_valid_uid *=" ${dovecot_conf_file})
+    [ -z "${first_valid_uid}" ] && { echo "no 'first_valid_uid=...' found in ${dovecot_conf_file} " 1>&2; exit 1; }
+    first_valid_uid=${first_valid_uid#*=}
+    first_valid_uid=${first_valid_uid## }
+    if [ ${uid} -lt ${first_valid_uid} ]; then
+        sed -e 's/^first_valid_uid.*$/first_valid_uid = '${uid}'/' ${dovecot_conf_file} > ${temp_file} || exit 1
+        mv ${temp_file} ${dovecot_conf_file} || exit 1
+    fi
+
+    local last_valid_uid=$(grep "^last_valid_uid *=" ${dovecot_conf_file})
+    [ -z "${last_valid_uid}" ] && { echo "no 'last_valid_uid=...' found in ${dovecot_conf_file} " 1>&2; exit 1; }
+    last_valid_uid=${last_valid_uid#*=}
+    last_valid_uid=${last_valid_uid## }
+    if [ ${uid} -gt ${last_valid_uid} ]; then
+        sed -e 's/^last_valid_uid.*$/last_valid_uid = '${uid}'/' ${dovecot_conf_file} > ${temp_file} || exit 1
+        mv ${temp_file} ${dovecot_conf_file} || exit 1
+    fi
+
+    local first_valid_gid=$(grep "^first_valid_gid *=" ${dovecot_conf_file})
+    [ -z "${first_valid_gid}" ] && { echo "no 'first_valid_gid=...' found in ${dovecot_conf_file} " 1>&2; exit 1; }
+    first_valid_gid=${first_valid_gid#*=}
+    first_valid_gid=${first_valid_gid## }
+    if [ ${gid} -lt ${first_valid_gid} ]; then
+        sed -e 's/^first_valid_gid.*$/first_valid_gid = '${gid}'/' ${dovecot_conf_file} > ${temp_file} || exit 1
+        mv ${temp_file} ${dovecot_conf_file} || exit 1
+    fi
+
+    local last_valid_gid=$(grep "^last_valid_gid *=" ${dovecot_conf_file})
+    [ -z "${last_valid_gid}" ] && { echo "no 'last_valid_gid=...' found in ${dovecot_conf_file} " 1>&2; exit 1; }
+    last_valid_gid=${last_valid_gid#*=}
+    last_valid_gid=${last_valid_gid## }
+    if [ ${gid} -gt ${last_valid_gid} ]; then
+        sed -e 's/^last_valid_gid.*$/last_valid_gid = '${gid}'/' ${dovecot_conf_file} > ${temp_file} || exit 1
+        mv ${temp_file} ${dovecot_conf_file} || exit 1
+    fi
+
 }
 
 main "$@"
