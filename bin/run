@@ -1,9 +1,17 @@
 #!/usr/bin/env bash
 
+#
+# We use the host network driver and we bind directly to the host external network interface;
+# DOVECOT_LISTEN_ADDRESS and DOVECOT_LISTEN_PORT must be defined externally
+#
+
+[ -z "${DOVECOT_LISTEN_ADDRESS}" ] && { echo "'DOVECOT_LISTEN_ADDRESS' not defined" 1>&2; exit 1; }
+[ -z "${DOVECOT_LISTEN_PORT}" ] && { echo "'DOVECOT_LISTEN_PORT' not defined" 1>&2; exit 1; }
+
 docker run \
   -d \
-  -e DOVECOT_LISTEN_ADDRESS=192.168.1.136 \
-  -e DOVECOT_LISTEN_PORT=555 \
+  -e DOVECOT_LISTEN_ADDRESS=${DOVECOT_LISTEN_ADDRESS} \
+  -e DOVECOT_LISTEN_PORT=${DOVECOT_LISTEN_PORT} \
   --network=host \
   --restart=no \
   --name=dovecot \
