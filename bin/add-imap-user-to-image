@@ -122,6 +122,7 @@ function update-valid-ids() {
     if [ ${uid} -lt ${first_valid_uid} ]; then
         sed -e 's/^first_valid_uid.*$/first_valid_uid = '${uid}'/' ${dovecot_conf_file} > ${temp_file} || exit 1
         mv ${temp_file} ${dovecot_conf_file} || exit 1
+        echo "updated first_valid_uid = ${uid}"
     fi
 
     local last_valid_uid=$(grep "^last_valid_uid *=" ${dovecot_conf_file})
@@ -131,6 +132,7 @@ function update-valid-ids() {
     if [ ${uid} -gt ${last_valid_uid} ]; then
         sed -e 's/^last_valid_uid.*$/last_valid_uid = '${uid}'/' ${dovecot_conf_file} > ${temp_file} || exit 1
         mv ${temp_file} ${dovecot_conf_file} || exit 1
+        echo "updated last_valid_uid = ${uid}"
     fi
 
     local first_valid_gid=$(grep "^first_valid_gid *=" ${dovecot_conf_file})
@@ -140,6 +142,7 @@ function update-valid-ids() {
     if [ ${gid} -lt ${first_valid_gid} ]; then
         sed -e 's/^first_valid_gid.*$/first_valid_gid = '${gid}'/' ${dovecot_conf_file} > ${temp_file} || exit 1
         mv ${temp_file} ${dovecot_conf_file} || exit 1
+        echo "updated first_valid_gid = ${gid}"
     fi
 
     local last_valid_gid=$(grep "^last_valid_gid *=" ${dovecot_conf_file})
@@ -149,6 +152,7 @@ function update-valid-ids() {
     if [ ${gid} -gt ${last_valid_gid} ]; then
         sed -e 's/^last_valid_gid.*$/last_valid_gid = '${gid}'/' ${dovecot_conf_file} > ${temp_file} || exit 1
         mv ${temp_file} ${dovecot_conf_file} || exit 1
+        echo "updated last_valid_gid = ${gid}"
     fi
 
 }
