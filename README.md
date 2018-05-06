@@ -12,9 +12,9 @@ Metadata and operational logic needed to build and operate a dovecot container.
   
 ```
 cd ssl
-openssl genrsa -out ./private/dovecot-private.pem 2048
+openssl genrsa -out ./private/imap.feodorov.com-private.pem 2048
 chmod -R go-rwx ./private
-openssl rsa -pubout -in ./private/dovecot-private.pem -out ./certs/dovecot-pub.pem
+openssl .... self-signed cert
 ``` 
     
    

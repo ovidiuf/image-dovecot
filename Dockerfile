@@ -58,7 +58,7 @@ RUN yum install -y iproute net-tools gettext && \
 # various linnks
 #
   mkdir /usr/local/libexec/dovecot && \
-  ln -s /opt/dovecot/bin/ssl-build-param /usr/local/libexec/dovecot 
+  ln -s /opt/dovecot/bin/ssl-build-param /usr/local/libexec/dovecot
 
 WORKDIR /opt/dovecot
 
