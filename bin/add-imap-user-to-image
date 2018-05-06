@@ -19,6 +19,7 @@ EOF
 function main() {
 
     local user
+    local password_file
     local password
     local uid
     local gid
@@ -31,9 +32,9 @@ function main() {
 
             user=$1
 
-        elif [[ $1 =~ --password= ]]; then
+        elif [[ $1 =~ --password-file= ]]; then
 
-            password=${1:11}
+            password_file=${1:16}
 
         elif [[ $1 =~ --uid= ]]; then
 
@@ -59,6 +60,11 @@ function main() {
     [[ ${password} =~ REPLACE ]] && { echo "" 1>&2; echo "provide a valid password for add-imap-user-to-image [...] --password=... in Dockerfile" 1>&2; echo "" 1>&2; exit 1; }
 
     [ -z "${user}" ] && { usage; return 1; }
+
+    [ -z "${password_file}" ] && { echo "no --password-file was provided, we cannot determine ${user}'s password" 1>&2; return 1; }
+    [ -f ${password_file} ] || { echo "" 1>&2; echo "Password file ${password_file} does not exist or cannot be read, so we cannot determine ${user}'s password." 1>&2; echo "Write ${user}'s password in ./root/opt/.tmp/.${user} and try again." 1>&2; echo "" 1>&2; return 1; }
+    password=$(head -1 ${password_file})
+    [ -z "${password}" ] && { echo "no password can be read from ${password_file}" 1>&2; return 1; }
 
     add-user "${user}" "${password}" "${uid}" "${gid}" "${dovecot_conf_file}" "${dovecotpw_file}"
 }

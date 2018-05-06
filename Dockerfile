@@ -33,13 +33,12 @@ RUN yum install -y iproute net-tools gettext && \
 #
 # Add IMAP users. The uid/gid/password of an IMAP user will be built into conf/passwd and conf/userdb,
 # and it will also be referred from the conf file (first_valid_uid/last_valid_uid). No OS-level user
-# needs to be created, just we need to make sure there's no uid/gid conflict.
+# needs to be created, just we need to make sure there's no uid/gid conflict. For handling passwords,
+# we temporarily use an improvisation: we write the password externally into a /opt/.tmp/.<user-name>
+# file and read it at execution time from there. This command will delete it after it is read
 #
   /opt/.tmp/add-imap-user-to-image ovidiu \
-#
-# --password=REPLACE-WITH-PASSWORD-BEFORE-BUILD
-#
-   --password=blah123 \
+   --password-file=/opt/.tmp/.ovidiu \
    --uid=58580 \
    --gid=58580 \
    --dovecot-conf-file=/opt/dovecot/conf/dovecot.conf \
