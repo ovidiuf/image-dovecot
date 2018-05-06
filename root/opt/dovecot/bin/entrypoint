@@ -19,11 +19,6 @@ function main() {
         echo "created /opt/dovecot/external/log"
     fi
 
-    if [ ! -d /opt/dovecot/external/ssl ]; then
-        mkdir /opt/dovecot/external/ssl
-        echo "created /opt/dovecot/external/ssl"
-    fi
-
     if [ ! -d /opt/dovecot/external/imap-data ]; then
         mkdir /opt/dovecot/external/imap-data
         echo "created /opt/dovecot/external/imap-data"
@@ -36,6 +31,13 @@ function main() {
     fi
 
     create-maildir-directories-if-they-do-not-exist;
+
+    #
+    # since we're self-signing the server certificate anyway, it makes sense to initialize it when
+    # the server is first started, and store it outside the image
+    #
+
+    initialize-ssl-certificates-if-they-do-not-exist;
 
     exec /opt/dovecot/bin/dovecot -F -c /opt/dovecot/conf/dovecot.conf
 }
@@ -59,6 +61,47 @@ function create-maildir-directories-if-they-do-not-exist() {
         echo "created /opt/dovecot/external/imap-data/${username}"
         chown ${uid} /opt/dovecot/external/imap-data/${username}
     done
+}
+
+function initialize-ssl-certificates-if-they-do-not-exist() {
+
+    if [ ! -d /opt/dovecot/external/ssl ]; then
+        mkdir /opt/dovecot/external/ssl
+        echo "created /opt/dovecot/external/ssl"
+    fi
+
+    if [ ! -d /opt/dovecot/external/ssl/certs ]; then
+        mkdir /opt/dovecot/external/ssl/certs
+        echo "created /opt/dovecot/external/ssl/certs"
+    fi
+
+    if [ ! -d /opt/dovecot/external/ssl/private ]; then
+        mkdir /opt/dovecot/external/ssl/private
+        echo "created /opt/dovecot/external/ssl/private"
+        chmod 0700 /opt/dovecot/external/ssl/private
+    fi
+
+    if [ ! -f /opt/dovecot/external/ssl/private/imap.feodorov.com-private.pem ]; then
+
+        #
+        # initialize the private key
+        #
+
+        openssl genrsa -out /opt/dovecot/external/ssl/private/imap.feodorov.com-private.pem 2048
+        chmod 0400 /opt/dovecot/external/ssl/private/imap.feodorov.com-private.pem
+        echo "initialized private key"
+
+        #
+        # self-sign the certificate
+        #
+
+        openssl req -new -x509 -days 7300 -key /opt/dovecot/external/ssl/private/imap.feodorov.com-private.pem \
+          -out /opt/dovecot/external/ssl/certs/imap.feodorov.com-cert.pem \
+          -subj "/C=US/L=Menlo Park/O=feodorov.com/CN=imap.feodorov.com"
+        echo "self-signed the certificate"
+
+    fi
+
 }
 
 main "$@"

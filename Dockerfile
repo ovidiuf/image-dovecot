@@ -28,7 +28,7 @@ VOLUME /opt/dovecot/external
 
 COPY ./bin/add-imap-user-to-image /opt/.tmp/add-imap-user-to-image
 
-RUN yum install -y iproute net-tools gettext && \
+RUN yum install -y iproute net-tools gettext openssl && \
   mkdir -p /opt/dovecot/home/ && \
   groupadd -g ${DOVECOT_USER_GID} dovecot && \
   useradd -m -g ${DOVECOT_USER_GID} -u ${DOVECOT_USER_UID} -d /opt/dovecot/home/dovecot dovecot && \
