@@ -33,6 +33,13 @@ function main() {
         #
         chgrp imapusers /opt/dovecot/external/imap-data
         chmod g+rwx /opt/dovecot/external/imap-data
+
+        #
+        # create the maildir directories
+        #
+#        for i in $(cat /opt/dovecot/conf/userdb); do
+#        done
+
     fi
 
     exec /opt/dovecot/bin/dovecot -F -c /opt/dovecot/conf/dovecot.conf
