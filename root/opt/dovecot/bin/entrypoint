@@ -11,12 +11,23 @@ function main() {
     chown dovecot:dovecot /opt/dovecot/conf/dovecot.conf
 
     #
-    # initialize log dir
+    # initialize directories if first time we boot
     #
 
-    [ -d /opt/dovecot/external/log ] || mkdir /opt/dovecot/external/log
-    [ -d /opt/dovecot/external/ssl ] || mkdir /opt/dovecot/external/ssl
-    [ -d /opt/dovecot/external/imap-data ] || mkdir /opt/dovecot/external/imap-data
+    if [ ! -d /opt/dovecot/external/log ]; then
+        mkdir /opt/dovecot/external/log
+        echo "created /opt/dovecot/external/log"
+    fi
+
+    if [ ! -d /opt/dovecot/external/ssl ]; then
+        mkdir /opt/dovecot/external/ssl
+        echo "created /opt/dovecot/external/ssl"
+    fi
+
+    if [ ! -d /opt/dovecot/external/imap-data ]; then
+        mkdir /opt/dovecot/external/imap-data
+        echo "created /opt/dovecot/external/imap-data"
+    fi
 
     exec /opt/dovecot/bin/dovecot -F -c /opt/dovecot/conf/dovecot.conf
 }
