@@ -10,6 +10,14 @@ function main() {
     mv /tmp/.tmp.txt /opt/dovecot/conf/dovecot.conf
     chown dovecot:dovecot /opt/dovecot/conf/dovecot.conf
 
+    #
+    # initialize log dir
+    #
+
+    [ -d /opt/dovecot/external/log ] || mkdir /opt/dovecot/external/log
+    [ -d /opt/dovecot/external/ssl ] || mkdir /opt/dovecot/external/ssl
+    [ -d /opt/dovecot/external/imap-data ] || mkdir /opt/dovecot/external/imap-data
+
     exec /opt/dovecot/bin/dovecot -F -c /opt/dovecot/conf/dovecot.conf
 }
 

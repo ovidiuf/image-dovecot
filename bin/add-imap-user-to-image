@@ -113,7 +113,7 @@ function add-user() {
     #
 
     local userdb_file=$(dirname ${dovecot_conf_file})/userdb
-    local user_home_dir=/opt/dovecot/home/${user}
+    local user_home_dir=/opt/dovecot/external/imap-data/${user}
 
     echo "${user}:x:${uid}:${gid}::${user_home_dir}:-" >> ${userdb_file}
 

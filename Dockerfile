@@ -19,6 +19,8 @@ USER root
 
 COPY ./root /
 
+VOLUME /opt/dovecot/external
+
 #
 # stage utility scripts
 #
