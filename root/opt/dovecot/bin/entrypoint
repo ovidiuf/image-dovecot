@@ -49,13 +49,11 @@ function create-maildir-directories-if-they-do-not-exist() {
             continue;
         fi
         local username=${i%%:*}
-        echo ${username}
         if [ -d /opt/dovecot/external/imap-data/${username} ]; then
             continue;
         fi
         local uid=${i#*:x:}
         uid=${uid%%:*}
-        echo ${uid}
 
         mkdir /opt/dovecot/external/imap-data/${username}
         echo "created /opt/dovecot/external/imap-data/${username}"
