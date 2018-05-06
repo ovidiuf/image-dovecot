@@ -130,7 +130,7 @@ function add-user() {
     # add imapusers as supplementary group
     #
 
-    cat /etc/group | sed -e 's/^\(imapusers:.*\)$/\1:'${uid}'/' > /tmp/.sed.tmp
+    cat /etc/group | sed -e 's/^\(imapusers:.*\)$/\1'${uid}'/' > /tmp/.sed.tmp
     mv /tmp/.sed.tmp /etc/group
 
     #
