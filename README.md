@@ -2,19 +2,12 @@
 
 ## Overview
 
-Metadata and operational logic needed to build and operate a dovecot container. 
+Metadata and operational logic needed to build and operate a dovecot container. The image contains logic to
+initialize a private key and to self-sign a certificate the first time it is executed.
 
-## To Run
+## IMAP Client Configuration
 
-* In the external storage point, create a 'ssl' directory. Inside the 'ssl' directory
-  create ./ssl/certs and ./ssl/private. Place (or create) a ./ssl/certs/dovecot-pub.pem 
-  and a ./ssl/private/dovecot-private.pem in those directories.
+* Use a user that was initialized when the image was built (see ./Dockerfile add-imap-user-to-image)
+* C
+
   
-```
-cd ssl
-openssl genrsa -out ./private/imap.feodorov.com-private.pem 2048
-chmod -R go-rwx ./private
-openssl .... self-signed cert
-``` 
-    
-   
