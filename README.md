@@ -7,8 +7,8 @@ Metadata and operational logic needed to build and operate a dovecot container.
 ## To Run
 
 * In the external storage point, create a 'ssl' directory. Inside the 'ssl' directory
-  create ./ssl/certs and ./ssl/private. Place a ./ssl/certs/dovecot-pub.pem and a 
-  ./ssl/private/dovecot-private.pem
+  create ./ssl/certs and ./ssl/private. Place (or create) a ./ssl/certs/dovecot-pub.pem 
+  and a ./ssl/private/dovecot-private.pem in those directories.
   
 ```
 cd ssl
