@@ -14,6 +14,7 @@ ENV DOVECOT_LISTEN_PORT 143
 
 ENV DOVECOT_USER_UID 20205
 ENV DOVECOT_USER_GID 20205
+ENV IMAPUSERS_GID 20206
 
 USER root
 
@@ -33,6 +34,11 @@ RUN yum install -y iproute net-tools gettext && \
   useradd -m -g ${DOVECOT_USER_GID} -u ${DOVECOT_USER_UID} -d /opt/dovecot/home/dovecot dovecot && \
   chown -R ${DOVECOT_USER_UID}:${DOVECOT_USER_GID} /opt/dovecot && \
 #
+# This group will insure that all IMAP users can create the initial directory layout in
+# the external IMAP data directory
+#
+  groupadd -g ${IMAPUSERS_GID} imapusers && \
+#
 # Add IMAP users. The uid/gid/password of an IMAP user will be built into conf/passwd and conf/userdb,
 # and it will also be referred from the conf file (first_valid_uid/last_valid_uid). No OS-level user
 # needs to be created, just we need to make sure there's no uid/gid conflict. For handling passwords,
@@ -43,6 +49,7 @@ RUN yum install -y iproute net-tools gettext && \
    --password-file=/opt/.tmp/.ovidiu \
    --uid=58580 \
    --gid=58580 \
+   --imapusers-gid=${IMAPUSERS_GID} \
    --dovecot-conf-file=/opt/dovecot/conf/dovecot.conf \
    --dovecotpw=/opt/dovecot/bin/dovecotpw && \
 #

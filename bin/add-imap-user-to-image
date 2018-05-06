@@ -10,6 +10,7 @@ RUN ./bin/add-imap-user-to-image <user-name> \
     --password=<password> \
     --uid=<uid> \
     --gid=<gid> \
+    --imapusers-gid=<imapusers-gid> \
     --dovecot-conf-file=<dovecot-conf-file> \
     --dovecotpw=<dovecotpw-fully-qualified-path>
 
@@ -23,6 +24,7 @@ function main() {
     local password
     local uid
     local gid
+    local imapusers_gid
     local dovecot_conf_file
     local dovecotpw_file
 
@@ -43,6 +45,10 @@ function main() {
         elif [[ $1 =~ --gid= ]]; then
 
             gid=${1:6}
+
+        elif [[ $1 =~ --imapusers-gid= ]]; then
+
+            imapusers_gid=${1:16}
 
         elif [[ $1 =~ --dovecot-conf-file= ]]; then
 
@@ -66,7 +72,7 @@ function main() {
     password=$(head -1 ${password_file})
     [ -z "${password}" ] && { echo "no password can be read from ${password_file}" 1>&2; return 1; }
 
-    add-user "${user}" "${password}" "${uid}" "${gid}" "${dovecot_conf_file}" "${dovecotpw_file}"
+    add-user "${user}" "${password}" "${uid}" "${gid}" "${imapusers_gid}" "${dovecot_conf_file}" "${dovecotpw_file}"
 }
 
 function add-user() {
@@ -75,13 +81,15 @@ function add-user() {
     local password=$2
     local uid=$3
     local gid=$4
-    local dovecot_conf_file=$5
-    local dovecotpw_file=$6
+    local imapusers_gid=$5
+    local dovecot_conf_file=$6
+    local dovecotpw_file=$7
 
     [ -z "${user}" ] && { echo "'user' not provided" 1>&2; exit 1; }
     [ -z "${password}" ] && { echo "'password' not provided" 1>&2; exit 1; }
     [ -z "${uid}" ] && { echo "'uid' not provided" 1>&2; exit 1; }
     [ -z "${gid}" ] && { echo "'gid' not provided" 1>&2; exit 1; }
+    [ -z "${imapusers_gid}" ] && { echo "'imapusers_gid' not provided" 1>&2; exit 1; }
     [ -z "${dovecot_conf_file}" ] && { echo "'dovecot_conf_file' not provided" 1>&2; exit 1; }
     [ -f ${dovecot_conf_file} ] || { echo "dovecot_conf_file ${dovecot_conf_file} does not exist or not readable" 1>&2; exit 1; }
     [ -z "${dovecotpw_file}" ] && { echo "'dovecotpw_file' not provided" 1>&2; exit 1; }
@@ -91,6 +99,7 @@ function add-user() {
     echo "adding IMAP user '${user}' ..."
     echo "uid: ${uid}"
     echo "gid: ${gid}"
+    echo "imapusers_gid: ${imapusers_gid}"
     echo "dovecot configuration file: ${dovecot_conf_file}"
 
     update-valid-ids ${uid} ${gid} ${dovecot_conf_file}
@@ -116,6 +125,13 @@ function add-user() {
     local user_home_dir=/opt/dovecot/home/${user}
 
     echo "${user}:x:${uid}:${gid}::${user_home_dir}:-" >> ${userdb_file}
+
+    #
+    # add imapusers as supplementary group
+    #
+
+    cat /etc/group | sed -e 's/^\(imapusers:.*\)$/\1:'${uid}'/' > /tmp/.sed.tmp
+    mv /tmp/.sed.tmp /etc/group
 
     #
     # create the home directory

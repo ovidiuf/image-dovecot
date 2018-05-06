@@ -27,6 +27,12 @@ function main() {
     if [ ! -d /opt/dovecot/external/imap-data ]; then
         mkdir /opt/dovecot/external/imap-data
         echo "created /opt/dovecot/external/imap-data"
+        #
+        # we want to make sure that IMAP users can create the initial
+        # structures in the imap-data
+        #
+        chgrp imapusers /opt/dovecot/external/imap-data
+        chmod g+rwx /opt/dovecot/external/imap-data
     fi
 
     exec /opt/dovecot/bin/dovecot -F -c /opt/dovecot/conf/dovecot.conf
