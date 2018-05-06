@@ -101,7 +101,6 @@ function initialize-ssl-certificates-if-they-do-not-exist() {
         echo "self-signed the certificate"
 
     fi
-
 }
 
 main "$@"
