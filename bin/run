@@ -8,11 +8,24 @@
 [ -z "${DOVECOT_LISTEN_ADDRESS}" ] && { echo "'DOVECOT_LISTEN_ADDRESS' not defined" 1>&2; exit 1; }
 [ -z "${DOVECOT_LISTEN_PORT}" ] && { echo "'DOVECOT_LISTEN_PORT' not defined" 1>&2; exit 1; }
 
+#
+# Make sure the expected volume exists, and if it does not, create it
+#
+if ! docker volume inspect rackstation-dovecot >/dev/null 2>&1; then 
+  echo "volume rackstation-dovecot does not exist, creating it ..."
+  docker volume create \
+   --driver local \
+   --opt type=nfs \
+   --opt o=addr=192.168.1.4,rw \
+   --opt device=:/volume1/dovecot \
+  rackstation-dovecot
+fi
+
 docker run \
   -d \
   -e DOVECOT_LISTEN_ADDRESS=${DOVECOT_LISTEN_ADDRESS} \
   -e DOVECOT_LISTEN_PORT=${DOVECOT_LISTEN_PORT} \
-  -v /nfs/dovecot:/opt/dovecot/external \
+  --mount type=volume,source=rackstation-dovecot,destination=/opt/dovecot/external \
   --network=host \
   --restart=no \
   --name=dovecot \
