@@ -11,6 +11,7 @@
 #
 # Make sure the expected volume exists, and if it does not, create it
 #
+
 if ! docker volume inspect rackstation-dovecot >/dev/null 2>&1; then 
   echo "volume rackstation-dovecot does not exist, creating it ..."
   docker volume create \
