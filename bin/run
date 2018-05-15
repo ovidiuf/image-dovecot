@@ -36,7 +36,7 @@ docker run \
   -d \
   -e DOVECOT_LISTEN_ADDRESS=${DOVECOT_LISTEN_ADDRESS} \
   -e DOVECOT_LISTEN_PORT=${DOVECOT_LISTEN_PORT} \
-  --mount type=volume,source=/tmp/exp1,destination=/opt/dovecot/external \
+  -v /tmp/exp1:/opt/dovecot/external \
   --network=host \
   --restart=no \
   --name=dovecot \
