@@ -32,11 +32,20 @@ fi
 #  --name=dovecot \
 # dovecot-v1.0.15-custom
 
+#docker run \
+#  -d \
+#  -e DOVECOT_LISTEN_ADDRESS=${DOVECOT_LISTEN_ADDRESS} \
+#  -e DOVECOT_LISTEN_PORT=${DOVECOT_LISTEN_PORT} \
+#  -v /tmp/exp1:/opt/dovecot/external \
+#  --network=host \
+#  --restart=no \
+#  --name=dovecot \
+# dovecot-v1.0.15-custom
+
 docker run \
   -d \
   -e DOVECOT_LISTEN_ADDRESS=${DOVECOT_LISTEN_ADDRESS} \
   -e DOVECOT_LISTEN_PORT=${DOVECOT_LISTEN_PORT} \
-  -v /tmp/exp1:/opt/dovecot/external \
   --network=host \
   --restart=no \
   --name=dovecot \
