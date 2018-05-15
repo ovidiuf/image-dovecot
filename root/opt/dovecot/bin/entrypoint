@@ -60,10 +60,10 @@ function create-maildir-directories-if-they-do-not-exist() {
         local uid=${i#*:x:}
         uid=${uid%%:*}
 
-        mkdir /opt/dovecot/external/imap-data/${username}
-        echo "created /opt/dovecot/external/imap-data/${username}"
-        chown ${uid} /opt/dovecot/external/imap-data/${username}
-        chmod 0700 /opt/dovecot/external/imap-data/${username}
+        mkdir -p /opt/dovecot/external/imap-data/${username}/Maildir
+        echo "created /opt/dovecot/external/imap-data/${username}/Maildir"
+        chown -R ${uid} /opt/dovecot/external/imap-data/${username}
+        chmod -R 0700 /opt/dovecot/external/imap-data/${username}
     done
 }
 
