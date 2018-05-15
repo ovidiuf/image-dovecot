@@ -127,13 +127,6 @@ function add-user() {
     echo "${user}:x:${uid}:${gid}::${user_home_dir}:-" >> ${userdb_file}
 
     #
-    # add imapusers as supplementary group to the dovecot user, so they can access storage directories
-    #
-
-    cat /etc/group | sed -e 's/^\(imapusers:.*\)$/\1'${uid}'/' > /tmp/.sed.tmp
-    mv /tmp/.sed.tmp /etc/group
-
-    #
     # create the home directory
     #
 
@@ -142,10 +135,15 @@ function add-user() {
     chmod 0700 ${user_home_dir}
 
     #
-    # add the users to the system,
+    # add the dovecot user to the system, we need this to assign supplementary groups which
+    # allow the users to access external shared storage
     #
     groupadd -g ${gid} ${user}
-    useradd -g ${gid} -u ${uid} ${user}
+
+    #
+    # add imapusers as supplementary group to the dovecot user, so they can access storage directories
+    #
+    useradd -g ${gid} -G imapusers -u ${uid} ${user}
 }
 
 #
