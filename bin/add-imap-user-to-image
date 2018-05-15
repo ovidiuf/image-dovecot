@@ -140,6 +140,12 @@ function add-user() {
     mkdir ${user_home_dir}
     chown ${uid}:${gid} ${user_home_dir}
     chmod 0700 ${user_home_dir}
+
+    #
+    # add the users to the system,
+    #
+    groupadd -g ${gid} ${user}
+    useradd -g ${gid} -u ${uid} ${user}
 }
 
 #
