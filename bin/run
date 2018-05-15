@@ -22,30 +22,11 @@ if ! docker volume inspect rackstation-dovecot >/dev/null 2>&1; then
   rackstation-dovecot
 fi
 
-#docker run \
-#  -d \
-#  -e DOVECOT_LISTEN_ADDRESS=${DOVECOT_LISTEN_ADDRESS} \
-#  -e DOVECOT_LISTEN_PORT=${DOVECOT_LISTEN_PORT} \
-#  --mount type=volume,source=rackstation-dovecot,destination=/opt/dovecot/external \
-#  --network=host \
-#  --restart=no \
-#  --name=dovecot \
-# dovecot-v1.0.15-custom
-
-#docker run \
-#  -d \
-#  -e DOVECOT_LISTEN_ADDRESS=${DOVECOT_LISTEN_ADDRESS} \
-#  -e DOVECOT_LISTEN_PORT=${DOVECOT_LISTEN_PORT} \
-#  -v /tmp/exp1:/opt/dovecot/external \
-#  --network=host \
-#  --restart=no \
-#  --name=dovecot \
-# dovecot-v1.0.15-custom
-
 docker run \
   -d \
   -e DOVECOT_LISTEN_ADDRESS=${DOVECOT_LISTEN_ADDRESS} \
   -e DOVECOT_LISTEN_PORT=${DOVECOT_LISTEN_PORT} \
+  --mount type=volume,source=rackstation-dovecot,destination=/opt/dovecot/external \
   --network=host \
   --restart=no \
   --name=dovecot \
