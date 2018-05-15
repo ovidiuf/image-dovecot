@@ -15,7 +15,7 @@ function main() {
     #
 
     chgrp imapusers /opt/dovecot/external
-    chmod 0770 /opt/dovecot/external
+    chmod 0775 /opt/dovecot/external
 
     if [ ! -d /opt/dovecot/external/log ]; then
         mkdir /opt/dovecot/external/log
@@ -31,7 +31,7 @@ function main() {
         # structures in the imap-data
         #
         chgrp imapusers /opt/dovecot/external/imap-data
-        chmod 0770 /opt/dovecot/external/imap-data
+        chmod 0775 /opt/dovecot/external/imap-data
     fi
 
     create-maildir-directories-if-they-do-not-exist;

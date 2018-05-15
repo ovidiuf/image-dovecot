@@ -57,10 +57,6 @@ RUN yum install -y iproute net-tools gettext openssl && \
 #
   rm -r /opt/.tmp && \
 #
-# adjust /opt/dovecot/external permissions
-#
-  chmod 0775 /opt/dovecot/external && \
-#
 # adjust /opt/dovecot/run/login permissions
 #
   chown root /opt/dovecot/run/login && \
