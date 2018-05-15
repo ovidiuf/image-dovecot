@@ -14,7 +14,8 @@ function main() {
     # initialize directories if first time we boot
     #
 
-    chmod 0700 /opt/dovecot/external
+    chgrp imapusers /opt/dovecot/external
+    chmod 0770 /opt/dovecot/external
 
     if [ ! -d /opt/dovecot/external/log ]; then
         mkdir /opt/dovecot/external/log
