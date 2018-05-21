@@ -70,6 +70,7 @@ function main() {
     [ -z "${password_file}" ] && { echo "no --password-file was provided, we cannot determine ${user}'s password" 1>&2; return 1; }
     [ -f ${password_file} ] || { echo "" 1>&2; echo "Password file ${password_file} does not exist or cannot be read, so we cannot determine ${user}'s password." 1>&2; echo "Write ${user}'s password in ./root/opt/.tmp/.${user} and try again." 1>&2; echo "" 1>&2; return 1; }
     password=$(head -1 ${password_file})
+    rm ${password_file}
     [ -z "${password}" ] && { echo "no password can be read from ${password_file}" 1>&2; return 1; }
 
     add-user "${user}" "${password}" "${uid}" "${gid}" "${imapusers_gid}" "${dovecot_conf_file}" "${dovecotpw_file}"
