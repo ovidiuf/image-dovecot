@@ -42,10 +42,15 @@ procedure.
 it build
 ````
 
-
 ## Run Container
 
 * Set DOVECOT_LISTEN_ADDRESS (currently 127.0.0.1) and DOVECOT_LISTEN_PORT in environment.
+* Set DOVECOT_EXTERNAL_STORAGE_DIR to the Docker host directory that is supposed to maintain Mailbox state and logs. 
+Usually this is an NFS directory, which should be mounted in /etc/fstab as follows:
+
+````
+192.168.1.111:/volume1/dovecot  /nfs/dovecot  nfs  defaults  0 0
+````
 
 Run the container with the included script:
 

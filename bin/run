@@ -7,6 +7,12 @@
 
 [ -z "${DOVECOT_LISTEN_ADDRESS}" ] && { echo "'DOVECOT_LISTEN_ADDRESS' not defined" 1>&2; exit 1; }
 [ -z "${DOVECOT_LISTEN_PORT}" ] && { echo "'DOVECOT_LISTEN_PORT' not defined" 1>&2; exit 1; }
+[ -z "${DOVECOT_EXTERNAL_STORAGE_DIR}" ] && { echo "'DOVECOT_EXTERNAL_STORAGE_DIR' not defined, set it to the directory dovecot is supposed to save external state" 1>&2; exit 1; }
+
+
+#####################################################################################################
+# An attempt to use a Docker NFS volume failed with "fcntl() failed ... No locks available"
+#####################################################################################################
 
 #
 # Make sure the expected volume exists, and if it does not, create it
@@ -32,11 +38,15 @@
 #  --name=dovecot \
 # dovecot-v1.0.15-custom
 
+#####################################################################################################
+# End of Docker NFS Volume attempt
+#####################################################################################################
+
 docker run \
   -d \
   -e DOVECOT_LISTEN_ADDRESS=${DOVECOT_LISTEN_ADDRESS} \
   -e DOVECOT_LISTEN_PORT=${DOVECOT_LISTEN_PORT} \
-  -v /rackstation/dovecot:/opt/dovecot/external \
+  -v ${DOVECOT_EXTERNAL_STORAGE_DIR}:/opt/dovecot/external \
   --network=host \
   --restart=no \
   --name=dovecot \
