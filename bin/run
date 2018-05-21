@@ -48,6 +48,6 @@ docker run \
   -e DOVECOT_LISTEN_PORT=${DOVECOT_LISTEN_PORT} \
   -v ${DOVECOT_EXTERNAL_STORAGE_DIR}:/opt/dovecot/external \
   --network=host \
-  --restart=no \
+  --restart=always \
   --name=dovecot \
  dovecot-v1.0.15-custom
